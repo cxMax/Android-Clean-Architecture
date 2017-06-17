@@ -26,5 +26,4 @@ public interface FragmentComponent {
     void inject(IndexFragment indexFragment);
 
     void inject(SettingFragment settingFragment);
-
 }

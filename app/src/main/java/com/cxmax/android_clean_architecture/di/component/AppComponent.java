@@ -24,4 +24,5 @@ public interface AppComponent {
     App getContext();
 
     RealmHelper realmHelper();
+
 }

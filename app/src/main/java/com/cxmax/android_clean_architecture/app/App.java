@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.support.multidex.MultiDex;
+import android.support.v7.app.AppCompatDelegate;
 
 import com.cxmax.android_clean_architecture.component.InitializeService;
 import com.cxmax.android_clean_architecture.di.component.AppComponent;
@@ -23,7 +24,7 @@ import io.realm.Realm;
  * Created by caixi on 17-4-17.
  */
 
-public class App extends Application{
+public class App extends Application {
 
     private static App instance;
     private Set<Activity> allActivities;
@@ -31,6 +32,11 @@ public class App extends Application{
 
     public static synchronized App getInstance() {
         return instance;
+    }
+
+    static {
+        AppCompatDelegate.setDefaultNightMode(
+                AppCompatDelegate.MODE_NIGHT_NO);
     }
 
     @Override
@@ -45,15 +51,6 @@ public class App extends Application{
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
         MultiDex.install(this);
-    }
-
-    public static AppComponent getAppComponent() {
-        if (appComponent == null) {
-            appComponent = DaggerAppComponent.builder()
-                    .appModule(new AppModule(instance))
-                    .build();
-        }
-        return appComponent;
     }
 
     public void addActivity(Activity act) {
@@ -79,5 +76,14 @@ public class App extends Application{
         }
         android.os.Process.killProcess(android.os.Process.myPid());
         System.exit(0);
+    }
+
+    public static AppComponent getAppComponent() {
+        if (appComponent == null) {
+            appComponent = DaggerAppComponent.builder()
+                    .appModule(new AppModule(instance))
+                    .build();
+        }
+        return appComponent;
     }
 }
