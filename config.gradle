@@ -18,7 +18,7 @@ ext {
             gson       : "2.8.0",
             junit      : "4.12",
             retrofit   : "2.2.0",
-            rxjava     : "2.1.0",
+            rxjava     : "2.0.7",
             rxandroid  : "2.0.1",
             rxlifecycle: "1.0",
             okhttp     : "3.6.0",
@@ -67,12 +67,10 @@ ext {
             "retrofit-converter-scalars": "com.squareup.retrofit2:converter-scalars:${dependVersion.retrofit}",
             "retrofit-adapter-rxjava"   : "com.squareup.retrofit2:adapter-rxjava:${dependVersion.retrofit}",
             "retrofit-converter-gson"   : "com.squareup.retrofit2:converter-gson:${dependVersion.retrofit}",
-            "retrofit-adapter-rxjava2"   : "'com.squareup.retrofit2:adapter-rxjava2:2.3.0'",
             // gson
             "gson"                      : "com.google.code.gson:gson:${dependVersion.gson}",
             //okhttp
             "okhttp"                    : "com.squareup.okhttp3:okhttp:${dependVersion.okhttp}",
-            "okio"                    : "'com.squareup.okio:okio:1.11.0",
             "okhttp-logging-interceptor": "com.squareup.okhttp3:logging-interceptor:${dependVersion.okhttp}",
             //glide
             "glide"                     : "com.github.bumptech.glide:glide:${dependVersion.glide}",
