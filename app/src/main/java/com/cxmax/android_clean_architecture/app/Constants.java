@@ -1,5 +1,9 @@
 package com.cxmax.android_clean_architecture.app;
 
+import android.os.Environment;
+
+import java.io.File;
+
 /**
  * @describe :
  * @usage :
@@ -23,4 +27,10 @@ public class Constants {
 
     //================= ACTION ====================
     public static final String ACTION_ALARM_MANAGER = "action_alarm_manager";
+    //================= PATH ====================
+
+    public static final String PATH_DATA = App.getInstance().getCacheDir().getAbsolutePath() + File.separator + "data";
+    public static final String PATH_CACHE = PATH_DATA + "/NetCache";
+    public static final String PATH_SDCARD = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "codeest" + File.separator + "GeekNews";
+
 }

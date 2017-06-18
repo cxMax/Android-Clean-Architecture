@@ -3,6 +3,8 @@ package com.cxmax.android_clean_architecture.di.module;
 
 import com.cxmax.android_clean_architecture.app.App;
 import com.cxmax.android_clean_architecture.model.db.RealmHelper;
+import com.cxmax.android_clean_architecture.model.http.HttpHelper;
+import com.cxmax.android_clean_architecture.model.http.RetrofitHelper;
 
 import javax.inject.Singleton;
 
@@ -35,5 +37,11 @@ public class AppModule {
     @Singleton
     RealmHelper provideRealmHelper() {
         return new RealmHelper();
+    }
+
+    @Provides
+    @Singleton
+    HttpHelper provideHttpHelper(RetrofitHelper retrofitHelper) {
+        return retrofitHelper;
     }
 }
