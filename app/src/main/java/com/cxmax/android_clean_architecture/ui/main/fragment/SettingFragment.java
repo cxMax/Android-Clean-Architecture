@@ -7,15 +7,22 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.AppCompatCheckBox;
 import android.widget.CompoundButton;
 
-
 import com.cxmax.android_clean_architecture.R;
 import com.cxmax.android_clean_architecture.app.Constants;
 import com.cxmax.android_clean_architecture.base.BaseFragment;
 import com.cxmax.android_clean_architecture.component.SharedPreferences.SharedPrefer;
 import com.cxmax.android_clean_architecture.presenter.SettingPresenter;
 import com.cxmax.android_clean_architecture.presenter.contract.SettingContract;
+import com.trello.rxlifecycle2.android.FragmentEvent;
 
 import butterknife.BindView;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * @describe :
@@ -57,12 +64,7 @@ public class SettingFragment extends BaseFragment<SettingPresenter> implements C
 
     @Override
     protected void initEventAndData() {
-        cbSettingNight.setChecked(SharedPrefer.from(context)
-                .open(Constants.NIGHT_MODE_FILE)
-                .read(Context.MODE_ENABLE_WRITE_AHEAD_LOGGING)
-                .getBoolean(Constants.SP_NIGHT_MODE, false));
-        cbSettingNight.setOnCheckedChangeListener(this);
-        cbSettingVoice.setOnCheckedChangeListener(this);
+        initCheckBoxes();
     }
 
     @Override
@@ -70,11 +72,7 @@ public class SettingFragment extends BaseFragment<SettingPresenter> implements C
         switch (compoundButton.getId()) {
             case R.id.cb_setting_night:
                 if (isNull) {   //防止夜间模式MainActivity执行reCreate后重复调用
-                    SharedPrefer.from(context)
-                            .open(Constants.NIGHT_MODE_FILE)
-                            .edit()
-                            .putBoolean(Constants.SP_NIGHT_MODE, b)
-                            .apply();
+                    asynchronousEditNightModeSharedPrefer(b);
                 }
                 break;
             case R.id.cb_setting_voice:
@@ -87,5 +85,46 @@ public class SettingFragment extends BaseFragment<SettingPresenter> implements C
                 }
                 break;
         }
+    }
+
+    private void asynchronousEditNightModeSharedPrefer(final boolean status) {
+        Observable.just("1")
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .compose(this.<String>bindUntilEvent(FragmentEvent.DETACH))
+                .subscribe(new Consumer<String>() {
+                    @Override
+                    public void accept(@io.reactivex.annotations.NonNull String s) throws Exception {
+                        SharedPrefer.from(context)
+                                .open(Constants.NIGHT_MODE_FILE)
+                                .edit()
+                                .putBoolean(Constants.SP_NIGHT_MODE, status)
+                                .apply();
+                    }
+                });
+    }
+
+    private void initCheckBoxes() {
+        Observable.create(new ObservableOnSubscribe<Boolean>() {
+            @Override
+            public void subscribe(ObservableEmitter<Boolean> e) throws Exception {
+                boolean status = SharedPrefer.from(context)
+                        .open(Constants.NIGHT_MODE_FILE)
+                        .read(Context.MODE_ENABLE_WRITE_AHEAD_LOGGING)
+                        .getBoolean(Constants.SP_NIGHT_MODE, false);
+                e.onNext(status);
+                e.onComplete();
+            }
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(this.<Boolean>bindUntilEvent(FragmentEvent.DETACH))
+                .subscribe(new Consumer<Boolean>() {
+                    @Override
+                    public void accept(@NonNull Boolean status) throws Exception {
+                        cbSettingNight.setChecked(status);
+                    }
+                });
+        cbSettingNight.setOnCheckedChangeListener(this);
+        cbSettingVoice.setOnCheckedChangeListener(this);
     }
 }

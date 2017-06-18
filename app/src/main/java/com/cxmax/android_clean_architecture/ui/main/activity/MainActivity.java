@@ -22,8 +22,12 @@ import com.cxmax.android_clean_architecture.ui.main.fragment.IndexFragment;
 import com.cxmax.android_clean_architecture.ui.main.fragment.SettingFragment;
 import com.cxmax.android_clean_architecture.util.SnackbarUtil;
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
+import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import butterknife.BindView;
+import io.reactivex.Observable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 import me.yokeyword.fragmentation.SupportFragment;
 
 public class MainActivity extends BaseActivity<MainPresenter> implements MainContract.View {
@@ -52,16 +56,29 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainCon
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (savedInstanceState == null) {
-            SharedPrefer.from(context)
-                    .open(Constants.NIGHT_MODE_FILE)
-                    .edit()
-                    .putBoolean(Constants.SP_NIGHT_MODE, false)
-                    .apply();
+            asynchronousEditNightModeSharedPrefer();
         } else {
             navigationView.getMenu().findItem(R.id.drawer_index).setChecked(false);
             toolbar.setTitle(navigationView.getMenu().findItem(getCurrentItem(showFragment)).getTitle().toString());
 
         }
+    }
+
+    private void asynchronousEditNightModeSharedPrefer() {
+        Observable.just("1")
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .compose(this.<String>bindUntilEvent(ActivityEvent.DESTROY))
+                .subscribe(new Consumer<String>() {
+                    @Override
+                    public void accept(@io.reactivex.annotations.NonNull String s) throws Exception {
+                        SharedPrefer.from(context)
+                                .open(Constants.NIGHT_MODE_FILE)
+                                .edit()
+                                .putBoolean(Constants.SP_NIGHT_MODE, false)
+                                .apply();
+                    }
+                });
     }
 
     @Override
